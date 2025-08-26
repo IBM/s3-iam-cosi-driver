@@ -1,0 +1,9 @@
+kind: BucketClaim
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: my-bucket1
+  namespace: default
+spec:
+  bucketClassName: account1-bc
+  protocols:
+  - s3

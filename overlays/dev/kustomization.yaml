@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: s3-iam-cosi-driver
+
+resources:
+  - ../../resources
+
+patches:
+  - path: patch-deployment.yaml

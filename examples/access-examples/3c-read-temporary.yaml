@@ -1,0 +1,37 @@
+# Explicitly allow read access to a bucket for a specific time period
+apiVersion: objectstorage.k8s.io/v1alpha1
+kind: BucketAccessClass
+metadata:
+  name: restricted-bucket-access-class
+authenticationType: KEY
+driverName: s3-iam.objectstorage.k8s.io
+parameters:
+  commonActions:
+    - "s3:GetObject"
+    - "s3:ListBucket"
+
+  defaultPolicy:
+    allow:
+      actions:
+        *commonActions
+  requestPolicy:
+    allow:
+      actions:
+        *commonActions
+  timeToLive: "2h"  # Optional expiration time for access
+
+  # All other actions are denied by default
+---
+# This acccess request will be granted read access to buckets for 2 hours.
+# After 2 hours, the access will be revoked.  The user needs to send a new
+# request to get access again.
+kind: BucketAccess
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: my-bucket1-access
+  namespace: default
+spec:
+  bucketClaimName: my-bucket1
+  bucketAccessClassName: restricted-bucket-access-class
+  credentialsSecretName: my-bucket1-credentials
+  protocol: s3

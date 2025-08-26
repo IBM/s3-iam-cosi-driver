@@ -1,0 +1,54 @@
+# User is granted read-only access to a bucket, by default.
+apiVersion: objectstorage.k8s.io/v1alpha1
+kind: BucketAccessClass
+metadata:
+  name: account1-read-only-access
+authenticationType: KEY
+driverName: s3-iam.objectstorage.k8s.io
+parameters:
+  # Define common allowed actions once with an anchor
+  commonActions:
+    - "s3:GetObject"
+    - "s3:ListBucket"
+
+  # Users are granted read-only access to buckets (by default or by request)
+  defaultPolicy:
+    allow:
+      actions:
+        *commonActions
+  requestPolicy:
+    allow:
+      actions:
+        *commonActions
+
+  # All other actions are denied by default
+---
+# By default, this request is granted read-only access to buckets.
+kind: BucketAccess
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: my-bucket1-access
+  namespace: default
+spec:
+  bucketClaimName: my-bucket1
+  bucketAccessClassName: account1-read-only-access
+  credentialsSecretName: my-bucket1-credentials
+  protocol: s3
+---
+# This request will get denied because it requests write actions.
+kind: BucketAccess
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: my-bucket1-access
+  namespace: default
+spec:
+  bucketClaimName: my-bucket1
+  bucketAccessClassName: account1-read-only-access
+  credentialsSecretName: my-bucket1-credentials
+  protocol: s3
+  accessRequest:
+    actions:
+      - "s3:GetObject"
+      - "s3:ListBucket"
+      - "s3:PutObject"    # <-- this is one is not allowed
+

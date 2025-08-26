@@ -1,0 +1,9 @@
+This project includes source code derived from the Ceph-COSI driver project,
+originally licensed under the Apache License, Version 2.0.
+
+Modifications and original contributions from IBM Corporation are licensed
+under the MIT License.
+
+Contributions from third-party developers may be licensed under either the
+Apache License 2.0 or the MIT License, depending on the nature and origin of
+the contribution. See individual files and commit history for details.

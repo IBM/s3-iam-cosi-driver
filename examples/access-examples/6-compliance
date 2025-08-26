@@ -1,0 +1,45 @@
+# Example showing how to enforce compliance with a policy
+apiVersion: objectstorage.k8s.io/v1alpha1
+kind: BucketAccessClass
+metadata:
+  name: controlled-write-access-class
+driverName: s3-iam.objectstorage.k8s.io
+authenticationType: KEY
+parameters:
+  # Define common allowed actions once with an anchor
+  commonActions:
+    - "s3:GetObject"
+    - "s3:ListBucket"
+    - "s3:PutObject"
+
+  # Users are granted read & write access to buckets (by default or by request)
+  defaultPolicy:
+    allow:
+      actions:
+        *commonActions
+  requestPolicy:
+    allow:
+      actions:
+        *commonActions
+    # Enforce compliance with a policy
+    deny:
+      actions:
+        - "s3:DeleteObject"
+
+  # All other actions are denied by default
+---
+# This request will be denied because it requests delete action.
+# This only demonstrates that the policy is enforced.
+kind: BucketAccess
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: my-bucket1-access
+  namespace: default
+spec:
+  bucketClaimName: my-bucket1
+  bucketAccessClassName: controlled-write-access-class
+  credentialsSecretName: my-bucket1-credentials
+  protocol: s3
+  accessRequest:
+    actions:
+      - "s3:DeleteObject"

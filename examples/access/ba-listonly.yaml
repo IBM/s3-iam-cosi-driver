@@ -1,0 +1,22 @@
+kind: BucketAccessClass
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: account1-bac-lo
+  annotations:
+    s3-iam.objectstorage.k8s.io/access-mode: lo
+driverName: s3-iam.objectstorage.k8s.io
+authenticationType: KEY
+parameters:
+  accountSecret: s3-account1
+  accountSecretNamespace: s3-iam-cosi-driver
+---
+kind: BucketAccess
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: my-bucket1-access-lo
+  namespace: default
+spec:
+  bucketClaimName: my-bucket1
+  bucketAccessClassName: account1-bac-lo
+  credentialsSecretName: my-bucket1-credentials-lo
+  protocol: s3

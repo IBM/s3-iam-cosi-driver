@@ -1,0 +1,14 @@
+apiVersion: objectstorage.k8s.io/v1alpha1
+kind: Bucket
+metadata:
+  name: account1-bcf5daf8bc-23a1-4812-a400-738e43b71605
+spec:
+  driverName: s3-iam.objectstorage.k8s.io
+  bucketClassName: account1-bc
+  protocols:
+    - s3
+  existingBucketID: account1-bcf5daf8bc-23a1-4812-a400-738e43b71605
+  bucketClaim:
+    name: my-bucket1
+    namespace: default
+    uid: f5daf8bc-23a1-4812-a400-738e43b71605

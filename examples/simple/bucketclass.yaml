@@ -1,0 +1,9 @@
+kind: BucketClass
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: account1-bc
+driverName: s3-iam.objectstorage.k8s.io
+deletionPolicy: Delete
+parameters:
+  accountSecret: s3-account1
+  accountSecretNamespace: s3-iam-cosi-driver

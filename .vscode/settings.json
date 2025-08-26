@@ -1,0 +1,4 @@
+{
+  "go.lintTool": "staticcheck",
+  "makefile.configureOnOpen": false
+}

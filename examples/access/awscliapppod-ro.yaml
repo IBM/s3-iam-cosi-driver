@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: awscli-ro
+  namespace: default
+spec:
+  containers:
+    - name: awscli
+      image: amazon/aws-cli:latest
+      command: ["/bin/sh", "-c", "
+        yum install -y jq &&
+        /setup-aws.sh &&
+        /bin/sh"]
+      stdin: true
+      tty: true
+      volumeMounts:
+        - name: bucket1-credentials
+          mountPath: /data/cosi
+          readOnly: true
+        - name: setup-script
+          mountPath: /setup-aws.sh
+          subPath: setup-aws.sh
+          readOnly: true
+  volumes:
+    - name: bucket1-credentials
+      secret:
+        secretName: my-bucket1-credentials-ro
+    - name: setup-script
+      configMap:
+        name: setup-aws-script
+        defaultMode: 0744

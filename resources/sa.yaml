@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: s3-iam-cosi-driver-sa
+  namespace: s3-iam-cosi-driver
+  labels:
+    app.kubernetes.io/part-of: container-object-storage-interface
+    app.kubernetes.io/component: driver-s3-iam
+    app.kubernetes.io/version: main
+    app.kubernetes.io/name: cosi-driver-s3-iam

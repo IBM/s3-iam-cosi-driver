@@ -1,0 +1,52 @@
+# Users can upload only, but not read or delete files.
+apiVersion: objectstorage.k8s.io/v1alpha1
+kind: BucketAccessClass
+metadata:
+  name: write-only-access-class
+driverName: s3-iam.objectstorage.k8s.io
+authenticationType: KEY
+parameters:
+
+  commonActions:
+    - "s3:PutObject"
+
+  # Users can upload (by request or by default)
+  defaultPolicy:
+    allow:
+      actions:
+        *commonActions
+  requestPolicy:
+    allow:
+      actions:
+        *commonActions
+
+  # All other actions are defined by default
+---
+# This request will be grated write-only access to buckets.
+kind: BucketAccess
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: my-bucket1-access
+  namespace: default
+spec:
+  bucketClaimName: my-bucket1
+  bucketAccessClassName: write-only-access-class
+  credentialsSecretName: my-bucket1-credentials
+  protocol: s3
+---
+# This request will get denied because it requests read action.
+kind: BucketAccess
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: my-bucket1-access
+  namespace: default
+spec:
+  bucketClaimName: my-bucket1
+  bucketAccessClassName: write-only-access-class
+  credentialsSecretName: my-bucket1-credentials
+  protocol: s3
+  accessRequest:
+    actions:
+      - "s3:GetObject"
+      - "s3:ListBucket"
+      - "s3:DeleteObject"

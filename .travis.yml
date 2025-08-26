@@ -1,0 +1,39 @@
+language: go
+
+go:
+- 1.21.x
+
+services:
+  - docker
+
+# Cache directories for Go modules and build cache
+cache:
+  directories:
+    - $HOME/go/pkg/mod         # Cache the Go modules
+    - $HOME/.cache/go-build    # Cache the Go build cache
+
+env:
+  global:
+    - REGION=us-east
+
+before_install:
+  # Install IBM Cloud CLI
+  - curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+  - ibmcloud plugin install container-registry
+
+install:
+  # Log in to IBM Cloud CLI
+  - ibmcloud login --apikey $IBM_CLOUD_API_KEY -r $REGION
+  - ibmcloud cr login
+
+before_script:
+  # Prepare Go modules
+  - go mod tidy
+  - go mod vendor
+
+script:
+  - make docker-build
+
+after_success:
+  # Push the Docker image to IBM Cloud Container Registry
+  - make docker-push

@@ -1,0 +1,83 @@
+# This example shows how an Admin can allow only specific Namespaces and Users to
+# make access requests.  In this case, the Admin is allowing only the 'allowed-namespace'
+# namespace to make access requests for read/write access to buckets.  These CRs are
+# created by the Admin.  Then User 'frank' can request access to buckets in the
+# 'allowed-namespace' namespace using the BucketAccessClass 'controlled-write-access-class'.
+---
+# Example of granting read/write access to bucket
+apiVersion: objectstorage.k8s.io/v1alpha1
+kind: BucketAccessClass
+metadata:
+  name: controlled-write-access-class
+driverName: s3-iam.objectstorage.k8s.io
+authenticationType: KEY
+parameters:
+  # Define common allowed actions once with an anchor
+  commonActions:
+    - "s3:GetObject"
+    - "s3:ListBucket"
+    - "s3:PutObject"
+
+  # Users are granted read & write access to buckets (by default or by request)
+  defaultPolicy:
+    effect: "Allow"
+    actions:
+      *commonActions
+  requestPolicy:
+    allow:
+      actions:
+        *commonActions
+
+  # All other actions are denied by default
+---
+# Restrict creation of BucketAccess resources to a specific namespace.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bucketaccess-creator
+  namespace: allowed-namespace  # Only allow this namespace to create access requests
+rules:
+- apiGroups: ["objectstorage.k8s.io"]
+  resources: ["bucketaccesses"]
+  verbs: ["create", "get", "list", "watch"]
+---
+# Grant 'frank' permission to create BucketAccess resources in the allowed namespace.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bucketaccess-binding
+  namespace: allowed-namespace
+subjects:
+- kind: User
+  name: frank  # Only allow this user to request access to buckets
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: bucketaccess-creator
+  apiGroup: rbac.authorization.k8s.io
+---
+# OR use you can use the following to restrict creation of BucketAccess resources to a specific class
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bucketaccess-readonly-role
+  namespace: my-namespace
+rules:
+  - apiGroups: ["objectstorage.k8s.io"]
+    resources: ["bucketaccesses"]
+    verbs: ["create", "get", "list"]
+    resourceNames: ["readonly-bucketaccessclass"] # Restrict creation to this class
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: usera-bucketaccess-readonly-binding
+  namespace: my-namespace
+subjects:
+  - kind: User
+    name: "UserA"
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: bucketaccess-readonly-role
+  apiGroup: rbac.authorization.k8s.io

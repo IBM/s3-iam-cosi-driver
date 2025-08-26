@@ -1,0 +1,53 @@
+# Examples where specific requests are required to access a bucket
+apiVersion: objectstorage.k8s.io/v1alpha1
+kind: BucketAccessClass
+metadata:
+  name: strict-whitelist-access-class
+driverName: s3-iam.objectstorage.k8s.io
+authenticationType: KEY
+parameters:
+
+  # Users have no access by default...
+  defaultPolicy:
+    deny:
+      actions: []
+
+  # ...but when users request access, they will be granted read-only
+  requestPolicy:
+    allow:
+      actions:
+        - "s3:GetObject"
+        - "s3:ListBucket"
+
+  # All other actions are denied by default
+---
+# This request will be granted however no access is granted.  In other words,
+# only the IAM user is created associated with this bucket.  User can modify
+# the access policy to grant access to the bucket.
+kind: BucketAccess
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: my-bucket1-access
+  namespace: default
+spec:
+  bucketClaimName: my-bucket1
+  bucketAccessClassName: strict-whitelist-access-class
+  credentialsSecretName: my-bucket1-credentials
+  protocol: s3
+---
+# This request will be granted read-only access to the bucket.  This forces the
+# the user to request specific access to the bucket.
+kind: BucketAccess
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: my-bucket1-access
+  namespace: default
+spec:
+  bucketClaimName: my-bucket1
+  bucketAccessClassName: strict-whitelist-access-class
+  credentialsSecretName: my-bucket1-credentials
+  protocol: s3
+  accessRequest:
+    actions:
+      - "s3:GetObject"
+      - "s3:ListBucket"

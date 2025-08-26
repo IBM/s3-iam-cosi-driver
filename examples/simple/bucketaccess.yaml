@@ -1,0 +1,10 @@
+kind: BucketAccess
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: my-bucket1-access
+  namespace: default
+spec:
+  bucketClaimName: my-bucket1
+  bucketAccessClassName: account1-bac
+  credentialsSecretName: my-bucket1-credentials
+  protocol: s3

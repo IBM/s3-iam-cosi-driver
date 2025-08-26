@@ -1,0 +1,57 @@
+# User initially has read-only access, but can request write access.
+apiVersion: objectstorage.k8s.io/v1alpha1
+kind: BucketAccessClass
+metadata:
+  name: account1-read-only-access
+authenticationType: KEY
+driverName: s3-iam.objectstorage.k8s.io
+parameters:
+
+  # Users are granted read-only access to buckets by default
+  defaultPolicy:
+    allow:
+      actions:
+        - "s3:GetObject"
+        - "s3:ListBucket"
+
+  # Allow users to request write access for 1 hour only
+  requestPolicy:
+    allow:
+      actions:
+      - "s3:PutObject"
+      timeToLive: 1h
+
+  # All other actions are denied by default
+
+  # Note: if users requests Get/List, this will be denied because its not explicitly
+  # allowed in requestPolicy.allow.  Is this a feature or a problem?
+---
+# By default, this request is granted read-only access to buckets.
+kind: BucketAccess
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: my-bucket1-access
+  namespace: default
+spec:
+  bucketClaimName: my-bucket1
+  bucketAccessClassName: account1-read-only-access
+  credentialsSecretName: my-bucket1-credentials
+  protocol: s3
+---
+# This request will be granted, users has write access for 1 hour only
+# User do not need to specify the actions that are already granted by default.
+kind: BucketAccess
+apiVersion: objectstorage.k8s.io/v1alpha1
+metadata:
+  name: my-bucket1-access
+  namespace: default
+spec:
+  bucketClaimName: my-bucket1
+  bucketAccessClassName: account1-read-only-access
+  credentialsSecretName: my-bucket1-credentials
+  protocol: s3
+  accessRequest:
+    actions:
+      - "s3:PutObject"
+
+

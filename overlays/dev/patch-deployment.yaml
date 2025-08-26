@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: s3-iam-cosi-driver
+  namespace: s3-iam-cosi-driver
+spec:
+  template:
+    metadata:
+      labels:
+        mode: dev
+    spec:
+      containers:
+        - name: s3-iam-cosi-driver
+          image: alpine:3.19
+          command: ["/bin/sh"]
+          args: ["-c", "sleep infinity"]

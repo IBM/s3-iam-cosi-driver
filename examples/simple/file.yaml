@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: awscli
+spec:
+  containers:
+    - name: awscli
+      image: amazon/aws-cli:latest
+      volumeMounts:
+       - name: bucket1-creds
+          mountPath: /data/cosi
+       - name: bucket2-creds
+          mountPath: /data/cosi
+  volumes:
+    - name: bucket1-creds
+      secret:
+        secretName: bucket1-creds-secret
+    - name: bucket2-creds
+      secret:
+        secretName: bucket1-creds-secret
