@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.23.4
 
 require (
-	github.com/aws/aws-sdk-go v1.55.7
+	github.com/aws/aws-sdk-go v1.55.8
 	google.golang.org/grpc v1.66.0
 	k8s.io/apimachinery v0.31.3
 	k8s.io/client-go v0.31.3
