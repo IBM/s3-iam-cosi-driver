@@ -9,7 +9,7 @@ require (
 	google.golang.org/grpc v1.66.0
 	k8s.io/apimachinery v0.31.3
 	k8s.io/client-go v0.31.3
-	k8s.io/klog/v2 v2.130.1
+	k8s.io/klog/v2 v2.140.0
 	sigs.k8s.io/container-object-storage-interface-api v0.1.0
 	sigs.k8s.io/container-object-storage-interface-provisioner-sidecar v0.1.0
 	sigs.k8s.io/container-object-storage-interface-spec v0.1.0
