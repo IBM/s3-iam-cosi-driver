@@ -2,7 +2,7 @@ module github.ibm.com/graphene/s3-iam-cosi-driver
 
 go 1.23.0
 
-toolchain go1.23.4
+toolchain go1.27.1
 
 require (
 	github.com/aws/aws-sdk-go v1.55.7
