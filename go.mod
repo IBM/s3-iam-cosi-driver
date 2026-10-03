@@ -60,4 +60,4 @@ require (
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
 
-replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20240903143218-8af14fe29dc1
+replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20260928230214-8a89bd6388cc
